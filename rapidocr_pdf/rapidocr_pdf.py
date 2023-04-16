@@ -22,11 +22,11 @@ class PDFExtracter():
     def __call__(self, content: Union[str, Path, bytes]) -> Dict:
         try:
             file_type = self.which_type(content)
-        except (FileExistsError, TypeError):
-            raise PDFExtracterError('The input content is empty.')
+        except (FileExistsError, TypeError) as e:
+            raise PDFExtracterError('The input content is empty.') from e
 
         if file_type != 'pdf':
-            raise PDFExtracterError(f'The file type is not PDF format.')
+            raise PDFExtracterError('The file type is not PDF format.')
 
         try:
             pdf_data = self.load_pdf(content)
@@ -86,7 +86,7 @@ class PDFExtracter():
     def get_ocr_res(self, page_img_dict: Dict) -> Dict:
         ocr_res = {}
         for k, v in page_img_dict.items():
-            preds = self.text_sys(v)
+            preds, _ = self.text_sys(v)
             if preds:
                 _, rec_res, _ = list(zip(*preds))
                 ocr_res[str(k)] = '\n'.join(rec_res)

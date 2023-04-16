@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 # @Author: SWHL
-# @Contact: liekkaskono@163.come
+# @Contact: liekkaskono@163.com
 from pathlib import Path
 import sys
 
@@ -8,7 +8,7 @@ root_dir = Path(__file__).resolve().parent.parent
 sys.path.append(str(root_dir))
 
 import pytest
-from rapid_ocr_pdf import PDFExtracter, PDFExtracterError
+from rapidocr_pdf import PDFExtracter, PDFExtracterError
 
 test_file_dir = Path(__file__).resolve().parent / 'test_files'
 extracter = PDFExtracter()
@@ -18,13 +18,12 @@ extracter = PDFExtracter()
     'pdf_content, result1, result2',
     [
         (test_file_dir / 'direct_extract.pdf', 3214, 'The Ev'),
-        (test_file_dir / 'image.pdf', 3228, 'Kurbas'),
+        (test_file_dir / 'image.pdf', 3420, 'Kurbas'),
         (test_file_dir / 'direct_and_image.pdf', 3710, 'ABCNet'),
     ]
 )
 def test_different_pdf(pdf_content, result1, result2):
     result = extracter(pdf_content)
-
     assert len(result[0][1]) == result1
     assert result[0][1][:6] == result2
 
@@ -36,7 +35,7 @@ def test_input_bytes():
 
     result = extracter(data)
 
-    assert len(result[0][1]) == 3228
+    assert len(result[0][1]) == 3420
     assert result[0][1][:6] == 'Kurbas'
 
 

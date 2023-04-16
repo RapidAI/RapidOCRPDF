@@ -1,54 +1,66 @@
 # -*- encoding: utf-8 -*-
 # @Author: SWHL
-# @Contact: liekkaskono@163.come
-import os
-import re
+# @Contact: liekkaskono@163.com
 import sys
 
+import warnings
 import setuptools
+from get_pypi_latest_version import GetPyPiLatestVersion
 
 
-def extract_version(message: str) -> str:
-    pattern = r'\d+\.(?:\d+\.)*\d+'
-    matched_versions = re.findall(pattern, message)
-    if matched_versions:
-        return matched_versions[0]
-    return ''
+def get_readme():
+    readme_path = 'README.md'
+    with open(readme_path, 'r', encoding='utf-8') as f:
+        readme = f.read()
+    return readme
 
 
-# 首先判断传入的列表长度，如果大于2，则说明有其他参数
-# 否则，version是指定的tag值
+MODULE_NAME = 'rapidocr_pdf'
+VERSION_NUM = '0.0.1'
+
+obtainer = GetPyPiLatestVersion()
+try:
+    latest_version = obtainer(MODULE_NAME)
+    if latest_version:
+        VERSION_NUM = obtainer.version_add_one(latest_version)
+except ValueError:
+    warnings.warn(
+        f'The package {MODULE_NAME} seems to be submitting for the first time.')
+
 if len(sys.argv) > 2:
-    version = extract_version(''.join(sys.argv[2:]))
-else:
-    version = '1.0.0'
+    match_str = ' '.join(sys.argv[2:])
+    matched_versions = obtainer.extract_version(match_str)
+    if matched_versions:
+        VERSION_NUM = matched_versions
 sys.argv = sys.argv[:2]
 
-package_name = 'rapid_ocr_pdf'
-
-os.system(f"""echo "version = '{version}'" >> {package_name}/__init__.py""")
-
 setuptools.setup(
-    name=package_name,
-    version=version,
-    platforms='Any',
-    description='Tools of extracting PDF content based RapidOCR',
-    author='SWHL',
-    author_email='liekkaskono@163.com',
-    install_requires=['opencv_python>=4.4.0.46',
-                      'numpy>=1.19.5',
-                      'filetype',
-                      'pymupdf'],
+    name=MODULE_NAME,
+    version=VERSION_NUM,
+    platforms="Any",
+    description='Tools of extracting PDF content based on RapidOCR',
+    long_description=get_readme(),
+    long_description_content_type='text/markdown',
+    author="SWHL",
+    author_email="liekkaskono@163.com",
+    url="https://github.com/RapidAI/RapidOCRPDF",
+    license='Apache-2.0',
     include_package_data=True,
-    packages=[package_name],
+    install_requires=['filetype', 'pymupdf'],
+    package_dir={'': MODULE_NAME},
+    packages=setuptools.find_namespace_packages(where=MODULE_NAME),
+    keywords=[
+        'rapidocr_pdf,rapidocr_onnxruntime,ocr,text_detection,text_recognition,db,onnxruntime,paddleocr,openvino'
+    ],
     classifiers=[
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
     ],
-    python_requires='>=3.7,<=3.10',
+    python_requires='>=3.6,<=3.10',
     entry_points={
-        'console_scripts': [f'{package_name}={package_name}.{package_name}:main'],
+        'console_scripts': [f'{MODULE_NAME}={MODULE_NAME}.rapidocr_pdf:main'],
     }
 )
