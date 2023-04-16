@@ -10,7 +10,7 @@
 ### 使用
 1. 安装`rapid_ocr_pdf`库
    ```bash
-    pip install rapid_ocr_pdf
+   pip install rapid_ocr_pdf
    ```
 2. 使用方式
     ```python
