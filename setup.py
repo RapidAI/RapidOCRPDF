@@ -23,15 +23,16 @@ try:
     latest_version = obtainer(MODULE_NAME)
     if latest_version:
         VERSION_NUM = obtainer.version_add_one(latest_version)
+
+    if len(sys.argv) > 2:
+        match_str = ' '.join(sys.argv[2:])
+        matched_versions = obtainer.extract_version(match_str)
+        if matched_versions:
+            VERSION_NUM = matched_versions
 except ValueError:
     warnings.warn(
         f'The package {MODULE_NAME} seems to be submitting for the first time.')
 
-if len(sys.argv) > 2:
-    match_str = ' '.join(sys.argv[2:])
-    matched_versions = obtainer.extract_version(match_str)
-    if matched_versions:
-        VERSION_NUM = matched_versions
 sys.argv = sys.argv[:2]
 
 setuptools.setup(
