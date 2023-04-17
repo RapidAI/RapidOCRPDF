@@ -2,14 +2,14 @@
 # @Author: SWHL
 # @Contact: liekkaskono@163.com
 import sys
-
 import warnings
+
 import setuptools
 from get_pypi_latest_version import GetPyPiLatestVersion
 
 
 def get_readme():
-    readme_path = 'README.md'
+    readme_path = './docs/docs.md'
     with open(readme_path, 'r', encoding='utf-8') as f:
         readme = f.read()
     return readme
@@ -48,10 +48,7 @@ setuptools.setup(
     include_package_data=True,
     install_requires=['filetype', 'pymupdf'],
     package_dir={'': MODULE_NAME},
-    packages=setuptools.find_namespace_packages(where=MODULE_NAME),
-    keywords=[
-        'rapidocr_pdf,rapidocr_onnxruntime,ocr,text_detection,text_recognition,db,onnxruntime,paddleocr,openvino'
-    ],
+    keywords=['rapidocr_pdf,rapidocr_onnxruntime,ocr,onnxruntime,openvino'],
     classifiers=[
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
@@ -62,5 +59,9 @@ setuptools.setup(
     python_requires='>=3.6,<=3.10',
     entry_points={
         'console_scripts': [f'{MODULE_NAME}={MODULE_NAME}.rapidocr_pdf:main'],
+    },
+    extras_require={
+        'onnxruntime': ['rapidocr_onnxruntime'],
+        'openvino': ['rapidocr_openvino']
     }
 )

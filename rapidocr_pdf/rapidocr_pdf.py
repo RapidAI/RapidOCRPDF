@@ -10,7 +10,13 @@ import cv2
 import filetype
 import fitz
 import numpy as np
-from rapidocr_onnxruntime import RapidOCR
+
+try:
+    from rapidocr_onnxruntime import RapidOCR
+except:
+    warnings.warn("Can't find the rapidocr_onnxruntime module,"
+                  "try to import the rapidocr_openvino")
+    from rapidocr_openvino import RapidOCR
 
 
 class PDFExtracter():
