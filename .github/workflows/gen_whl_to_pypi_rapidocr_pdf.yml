@@ -32,7 +32,7 @@ jobs:
 
       - name: Unit testings with rapidocr_openvino
         run: |
-          pip uninstall rapidocr_onnxruntime
+          pip uninstall rapidocr_onnxruntime -y
           pip install rapidocr_openvino
           pytest tests/test*.py
 
