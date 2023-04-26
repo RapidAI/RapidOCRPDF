@@ -10,10 +10,10 @@
 - 暂不包括版式还原。
 
 ### 使用
-1. 安装`rapid_ocr_pdf`库
+1. 安装`rapidocr_pdf`库
    ```bash
    # 基于rapidocr_onnxruntime
-   pip install rapid_ocr_pdf[onnxruntime]
+   pip install rapidocr_pdf[onnxruntime]
 
    # 基于rapidocr_openvino
    pip install rapidocr_pdf[openvino]
