@@ -1,4 +1,4 @@
 # -*- encoding: utf-8 -*-
 # @Author: SWHL
 # @Contact: liekkaskono@163.com
-from .rapidocr_pdf import PDFExtracter, PDFExtracterError
+from .main import PDFExtracter, PDFExtracterError

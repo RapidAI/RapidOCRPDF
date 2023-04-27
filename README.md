@@ -18,16 +18,30 @@
    # 基于rapidocr_openvino
    pip install rapidocr_pdf[openvino]
    ```
-2. 使用方式
-    ```python
-    from rapidocr_pdf import PDFExtracter
+2. 使用
+   - 脚本使用：
+        ```python
+        from rapidocr_pdf import PDFExtracter
 
-    pdf_extracter = PDFExtracter()
+        pdf_extracter = PDFExtracter()
 
-    pdf_path = 'tests/test_files/direct_and_image.pdf'
-    texts = pdf_extracter(pdf_path)
-    print(texts)
-    ```
+        pdf_path = 'tests/test_files/direct_and_image.pdf'
+        texts = pdf_extracter(pdf_path)
+        print(texts)
+        ```
+    - 命令行使用
+        ```bash
+        $ rapidocr_pdf -h
+        usage: rapidocr_pdf [-h] [-path FILE_PATH]
+
+        options:
+        -h, --help            show this help message and exit
+        -path FILE_PATH, --file_path FILE_PATH
+                                File path, PDF or images
+
+        $ rapidocr_pdf -path tests/test_files/direct_and_image.pdf
+        ```
+
 3. 输入输出说明
    - **输入**：`Union[str, Path, bytes]`
    - **输出**：`List` \[**页码**, **文本内容** + **置信度**\]， 具体参见下例：
@@ -37,3 +51,7 @@
            ['1', 'ABCNet: Real-time Scene Text Spotting with Adaptive Bezier-Curve Network∗\nYuliang Liu‡†', '0.8969868'],
        ]
        ```
+
+### 更新日志
+- 2023-04-17 v0.0.2 update:
+  - 完善使用文档

@@ -1,5 +1,4 @@
 filetype>=1.2.0
 pymupdf>=1.21.0
-rapidocr_onnxruntime
 get_pypi_latest_version
 pytest

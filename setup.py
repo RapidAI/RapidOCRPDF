@@ -46,20 +46,18 @@ setuptools.setup(
     author_email="liekkaskono@163.com",
     url="https://github.com/RapidAI/RapidOCRPDF",
     license='Apache-2.0',
-    include_package_data=True,
+    packages=[MODULE_NAME],
     install_requires=['filetype', 'pymupdf'],
-    package_dir={'': MODULE_NAME},
     keywords=['rapidocr_pdf,rapidocr_onnxruntime,ocr,onnxruntime,openvino'],
     classifiers=[
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
     ],
-    python_requires='>=3.6,<=3.10',
+    python_requires='>=3.7,<=3.10',
     entry_points={
-        'console_scripts': [f'{MODULE_NAME}={MODULE_NAME}.rapidocr_pdf:main'],
+        'console_scripts': [f'{MODULE_NAME}={MODULE_NAME}.main:main'],
     },
     extras_require={
         'onnxruntime': ['rapidocr_onnxruntime'],

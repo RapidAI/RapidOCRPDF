@@ -6,19 +6,21 @@
     <a href="https://pepy.tech/project/rapidocr-pdf"><img src="https://static.pepy.tech/personalized-badge/rapidocr-pdf?period=total&units=abbreviation&left_color=grey&right_color=blue&left_text=Downloads"></a>
 </p>
 
-- 依托于[RapidOCR](https://github.com/RapidAI/RapidOCR)仓库，快速提取PDF中文字，包括扫描版PDF、加密版PDF。
-- 暂不包括版式还原。
+- Relying on [RapidOCR](https://github.com/RapidAI/RapidOCR), quickly extract text from PDF, including scanned PDF and encrypted PDF.
+- Layout restore is not included for now.
 
-### 使用
-1. 安装`rapidocr_pdf`库
+
+### 1. Install package by pypi.
    ```bash
-   # 基于rapidocr_onnxruntime
+   # base rapidocr_onnxruntime
    pip install rapidocr_pdf[onnxruntime]
 
-   # 基于rapidocr_openvino
+   # base rapidocr_openvino
    pip install rapidocr_pdf[openvino]
    ```
-2. 使用方式
+
+### 2. Use
+- Run by script.
     ```python
     from rapidocr_pdf import PDFExtracter
 
@@ -28,9 +30,21 @@
     texts = pdf_extracter(pdf_path)
     print(texts)
     ```
-3. 输入输出说明
-   - **输入**：`Union[str, Path, bytes]`
-   - **输出**：`List` \[**页码**, **文本内容** + **置信度**\]， 具体参见下例：
+- Run by command line.
+    ```bash
+    $ rapidocr_pdf -h
+    usage: rapidocr_pdf [-h] [-path FILE_PATH]
+
+    options:
+    -h, --help            show this help message and exit
+    -path FILE_PATH, --file_path FILE_PATH
+                            File path, PDF or images
+
+    $ rapidocr_pdf -path tests/test_files/direct_and_image.pdf
+    ```
+### 3. Ouput format.
+   - **Input**：`Union[str, Path, bytes]`
+   - **Output**：`List` \[**Page num**, **Page content** + **score**\], ：
        ```python
        [
            ['0', '达大学拉斯维加斯分校）的一次中文评测中获得最', '0.8969868'],
