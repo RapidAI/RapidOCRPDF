@@ -2,3 +2,4 @@ filetype>=1.2.0
 pymupdf>=1.21.0
 get_pypi_latest_version
 pytest
+rapidocr_onnxruntime
