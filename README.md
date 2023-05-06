@@ -7,7 +7,8 @@
 </p>
 
 - 依托于[RapidOCR](https://github.com/RapidAI/RapidOCR)仓库，快速提取PDF中文字，包括扫描版PDF、加密版PDF。
-- 暂不包括版式还原。
+- 如果是可以直接复制的PDF，可以直接使用[pdf2docx](https://github.com/dothinking/pdf2docx)，不再重复造轮子
+- 如果是扫描版PDF，暂时不支持版式还原，后续有空会考虑加上，日期不定。
 
 ### 使用
 1. 安装`rapidocr_pdf`库
