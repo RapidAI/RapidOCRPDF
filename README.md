@@ -45,11 +45,11 @@
 
 3. 输入输出说明
    - **输入**：`Union[str, Path, bytes]`
-   - **输出**：`List` \[**页码**, **文本内容** + **置信度**\]， 具体参见下例：
+   - **输出**：`List` \[**页码**, **文本内容**, **置信度**\]， 具体参见下例：
        ```python
        [
-           ['0', '达大学拉斯维加斯分校）的一次中文评测中获得最', '0.8969868'],
-           ['1', 'ABCNet: Real-time Scene Text Spotting with Adaptive Bezier-Curve Network∗\nYuliang Liu‡†', '0.8969868'],
+           ['0', '人之初，性本善。性相近，习相远。', '0.8969868'],
+           ['1', 'Men at their birth, are naturally good.', '0.8969868'],
        ]
        ```
 
