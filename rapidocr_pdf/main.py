@@ -25,7 +25,7 @@ class PDFExtracter():
         self.text_sys = RapidOCR()
         self.empyt_list = []
 
-    def __call__(self, content: Union[str, Path, bytes]) -> Dict:
+    def __call__(self, content: Union[str, Path, bytes]) -> List[List[Union[str, str, str]]]:
         try:
             file_type = self.which_type(content)
         except (FileExistsError, TypeError) as e:
