@@ -3,9 +3,19 @@
 # @Contact: liekkaskono@163.com
 import sys
 import warnings
+from typing import List
 
 import setuptools
 from get_pypi_latest_version import GetPyPiLatestVersion
+
+
+def read_txt(txt_path: str) -> List:
+    if not isinstance(txt_path, str):
+        txt_path = str(txt_path)
+
+    with open(txt_path, "r", encoding="utf-8") as f:
+        data = list(map(lambda x: x.rstrip("\n"), f))
+    return data
 
 
 def get_readme():
@@ -48,7 +58,7 @@ setuptools.setup(
     url="https://github.com/RapidAI/RapidOCRPDF",
     license="Apache-2.0",
     packages=[MODULE_NAME],
-    install_requires=["filetype", "pymupdf"],
+    install_requires=read_txt("requirements.txt"),
     keywords=["rapidocr_pdf,rapidocr_onnxruntime,ocr,onnxruntime,openvino"],
     classifiers=[
         "Programming Language :: Python :: 3.6",

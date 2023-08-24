@@ -1,5 +1,3 @@
 filetype>=1.2.0
 pymupdf==1.22.5
-get_pypi_latest_version
-pytest
 rapidocr_onnxruntime
