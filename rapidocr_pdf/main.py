@@ -14,25 +14,29 @@ import numpy as np
 try:
     from rapidocr_onnxruntime import RapidOCR
 except:
-    warnings.warn("Can't find the rapidocr_onnxruntime module,"
-                  "try to import the rapidocr_openvino")
+    warnings.warn(
+        "Can't find the rapidocr_onnxruntime module,"
+        "try to import the rapidocr_openvino"
+    )
     from rapidocr_openvino import RapidOCR
 
 
-class PDFExtracter():
+class PDFExtracter:
     def __init__(self, dpi=200):
         self.dpi = dpi
         self.text_sys = RapidOCR()
         self.empyt_list = []
 
-    def __call__(self, content: Union[str, Path, bytes]) -> List[List[Union[str, str, str]]]:
+    def __call__(
+        self, content: Union[str, Path, bytes]
+    ) -> List[List[Union[str, str, str]]]:
         try:
             file_type = self.which_type(content)
         except (FileExistsError, TypeError) as e:
-            raise PDFExtracterError('The input content is empty.') from e
+            raise PDFExtracterError("The input content is empty.") from e
 
-        if file_type != 'pdf':
-            raise PDFExtracterError('The file type is not PDF format.')
+        if file_type != "pdf":
+            raise PDFExtracterError("The file type is not PDF format.")
 
         try:
             pdf_data = self.load_pdf(content)
@@ -45,26 +49,24 @@ class PDFExtracter():
         ocr_res_dict = self.get_ocr_res(page_img_dict)
 
         final_result = {**txts_dict, **ocr_res_dict}
-        final_result = dict(sorted(final_result.items(),
-                                   key=lambda x: int(x[0])))
-        final_result = [[k, v, '1.0'] for k, v in final_result.items()]
+        final_result = dict(sorted(final_result.items(), key=lambda x: int(x[0])))
+        final_result = [[k, v, "1.0"] for k, v in final_result.items()]
         return final_result
 
     @staticmethod
     def load_pdf(pdf_content: Union[str, Path, bytes]) -> bytes:
         if isinstance(pdf_content, (str, Path)):
             if not Path(pdf_content).exists():
-                raise PDFExtracterError(f'{pdf_content} does not exist.')
+                raise PDFExtracterError(f"{pdf_content} does not exist.")
 
-            with open(pdf_content, 'rb') as f:
+            with open(pdf_content, "rb") as f:
                 data = f.read()
             return data
 
         if isinstance(pdf_content, bytes):
             return pdf_content
 
-        raise PDFExtracterError(
-            f'{type(pdf_content)} is not in [str, Path, bytes].')
+        raise PDFExtracterError(f"{type(pdf_content)} is not in [str, Path, bytes].")
 
     def extract_texts(self, pdf_data: bytes) -> Tuple[Dict, List]:
         texts, page_idxs = {}, []
@@ -95,17 +97,17 @@ class PDFExtracter():
             preds, _ = self.text_sys(v)
             if preds:
                 _, rec_res, _ = list(zip(*preds))
-                ocr_res[str(k)] = '\n'.join(rec_res)
+                ocr_res[str(k)] = "\n".join(rec_res)
         return ocr_res
 
     @staticmethod
     def which_type(content: Union[bytes, str, Path]) -> str:
         if isinstance(content, (str, Path)) and not Path(content).exists():
-            raise FileExistsError(f'{content} does not exist.')
+            raise FileExistsError(f"{content} does not exist.")
 
         kind = filetype.guess(content)
         if kind is None:
-            raise TypeError(f'The type of {content} does not support.')
+            raise TypeError(f"The type of {content} does not support.")
 
         return kind.extension
 
@@ -116,8 +118,9 @@ class PDFExtracterError(Exception):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-path', '--file_path', type=str,
-                        help='File path, PDF or images')
+    parser.add_argument(
+        "-path", "--file_path", type=str, help="File path, PDF or images"
+    )
     args = parser.parse_args()
 
     pdf_extracter = PDFExtracter()
@@ -126,5 +129,5 @@ def main():
     print(result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
