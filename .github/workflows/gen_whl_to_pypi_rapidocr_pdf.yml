@@ -28,13 +28,13 @@ jobs:
       - name: Unit testings with rapidocr_onnxruntime
         run: |
           pip install -r requirements.txt
-          pip install pytest pymupdf==1.22.5
+          pip install pytest pymupdf==1.22.5 rapidocr_onnxruntime==1.2.13
           pytest tests/test*.py
 
       - name: Unit testings with rapidocr_openvino
         run: |
           pip uninstall rapidocr_onnxruntime -y
-          pip install rapidocr_openvino pymupdf==1.22.5
+          pip install rapidocr_openvino pymupdf==1.22.5 rapidocr_openvino==1.2.12
           pytest tests/test*.py
 
   GenerateWHL_PushPyPi:
