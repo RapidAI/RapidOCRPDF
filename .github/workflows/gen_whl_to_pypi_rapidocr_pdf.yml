@@ -7,7 +7,7 @@ on:
       - 'rapidocr_pdf/**'
       - 'docs/doc.md'
       - 'setup.py'
-      # - '.github/workflows/gen_whl_to_pypi_rapidocr_pdf.yml'
+      - '.github/workflows/gen_whl_to_pypi_rapidocr_pdf.yml'
 
 jobs:
   UnitTesting:
@@ -28,13 +28,13 @@ jobs:
       - name: Unit testings with rapidocr_onnxruntime
         run: |
           pip install -r requirements.txt
-          pip install pytest
+          pip install pytest pymupdf==1.22.5
           pytest tests/test*.py
 
       - name: Unit testings with rapidocr_openvino
         run: |
           pip uninstall rapidocr_onnxruntime -y
-          pip install rapidocr_openvino
+          pip install rapidocr_openvino pymupdf==1.22.5
           pytest tests/test*.py
 
   GenerateWHL_PushPyPi:
