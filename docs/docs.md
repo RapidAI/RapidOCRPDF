@@ -22,7 +22,7 @@
    pip install rapidocr_pdf[openvino]
    ```
 
-### 2. Use
+### 2. Usage
 - Run by script.
     ```python
     from rapidocr_pdf import PDFExtracter

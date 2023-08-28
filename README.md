@@ -57,5 +57,7 @@
        ```
 
 ### 更新日志
+- 2023-08-28 v0.0.5 update:
+    - 解决PyMuPDF版本依赖问题，对应[issue #2](https://github.com/RapidAI/RapidOCRPDF/issues/2)
 - 2023-04-17 v0.0.2 update:
-  - 完善使用文档
+    - 完善使用文档
