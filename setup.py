@@ -43,7 +43,6 @@ except ValueError:
     warnings.warn(
         f"The package {MODULE_NAME} seems to be submitting for the first time."
     )
-
 sys.argv = sys.argv[:2]
 
 setuptools.setup(
