@@ -1,4 +1,4 @@
-name: Push rapidocr_onnxruntime to pypi
+name: Push rapidocr_pdf to pypi
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - 'rapidocr_pdf/**'
       - 'docs/doc.md'
       - 'setup.py'
-      - '.github/workflows/gen_whl_to_pypi_rapidocr_pdf.yml'
+      # - '.github/workflows/gen_whl_to_pypi_rapidocr_pdf.yml'
 
 jobs:
   UnitTesting:
@@ -56,13 +56,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install wheel get_pypi_latest_version
           python setup.py bdist_wheel ${{ github.event.head_commit.message }}
-
-      # - name: Publish distribution 📦 to Test PyPI
-      #   uses: pypa/gh-action-pypi-publish@v1.5.0
-      #   with:
-      #     password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-      #     repository_url: https://test.pypi.org/legacy/
-      #     packages_dir:  dist/
 
       - name: Publish distribution 📦 to PyPI
         uses: pypa/gh-action-pypi-publish@v1.5.0
