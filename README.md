@@ -2,7 +2,6 @@
     <div align="center">
     <h1><b><i>RapidOCR 📄 PDF</i></b></h1>
     </div>
-    <div>&nbsp;</div>
 
 <a href=""><img src="https://img.shields.io/badge/Python->=3.6,<3.12-aff.svg"></a>
 <a href=""><img src="https://img.shields.io/badge/OS-Linux%2C%20Win%2C%20Mac-pink.svg"></a>
