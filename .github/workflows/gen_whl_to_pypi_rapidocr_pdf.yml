@@ -2,12 +2,14 @@ name: Push rapidocr_pdf to pypi
 
 on:
   push:
-    branches: [ main ]
-    paths:
-      - 'rapidocr_pdf/**'
-      - 'docs/doc.md'
-      - 'setup.py'
-      - '.github/workflows/gen_whl_to_pypi_rapidocr_pdf.yml'
+    # branches: [ main ]
+    # paths:
+    #   - 'rapidocr_pdf/**'
+    #   - 'docs/doc.md'
+    #   - 'setup.py'
+    #   - '.github/workflows/gen_whl_to_pypi_rapidocr_pdf.yml'
+    tags:
+      - v*
 
 jobs:
   UnitTesting:

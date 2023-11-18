@@ -50,13 +50,22 @@ from rapidocr_pdf import PDFExtracter
 pdf_extracter = PDFExtracter()
 
 pdf_path = 'tests/test_files/direct_and_image.pdf'
-texts = pdf_extracter(pdf_path)
+texts = pdf_extracter(pdf_path, force_ocr=False)
 print(texts)
 ```
 
 命令行使用
 ```bash
-rapidocr_pdf -path tests/test_files/direct_and_image.pdf
+$ rapidocr_pdf -h
+usage: rapidocr_pdf [-h] [-path FILE_PATH] [-f]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -path FILE_PATH, --file_path FILE_PATH
+                        File path, PDF or images
+  -f, --force_ocr       Whether to use ocr for all pages.
+
+$ rapidocr_pdf -path tests/test_files/direct_and_image.pdf
 ```
 
 ### 输入输出说明
@@ -71,6 +80,9 @@ rapidocr_pdf -path tests/test_files/direct_and_image.pdf
 ```
 
 ### 更新日志
+2023-11-18 v0.0.7 update:
+- 修复[issue #3](https://github.com/RapidAI/RapidOCRPDF/issues/3), 添加`force_ocr`参数控制是否强制所有页面全部OCR
+
 2023-08-28 v0.0.6 update:
 - 解决PyMuPDF版本依赖问题，对应[issue #2](https://github.com/RapidAI/RapidOCRPDF/issues/2)
 

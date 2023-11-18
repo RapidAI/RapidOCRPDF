@@ -28,7 +28,9 @@ class PDFExtracter:
         self.empyt_list = []
 
     def __call__(
-        self, content: Union[str, Path, bytes]
+        self,
+        content: Union[str, Path, bytes],
+        force_ocr: bool = False,
     ) -> List[List[Union[str, str, str]]]:
         try:
             file_type = self.which_type(content)
@@ -44,13 +46,12 @@ class PDFExtracter:
             warnings.warn(str(e))
             return self.empyt_list
 
-        txts_dict, page_idxs = self.extract_texts(pdf_data)
-        page_img_dict = self.read_pdf_with_image(pdf_data, page_idxs)
+        txts_dict, need_ocr_idxs = self.extract_texts(pdf_data, force_ocr)
+
+        page_img_dict = self.read_pdf_with_image(pdf_data, need_ocr_idxs)
         ocr_res_dict = self.get_ocr_res(page_img_dict)
 
-        final_result = {**txts_dict, **ocr_res_dict}
-        final_result = dict(sorted(final_result.items(), key=lambda x: int(x[0])))
-        final_result = [[k, v, "1.0"] for k, v in final_result.items()]
+        final_result = self.merge_direct_ocr(txts_dict, ocr_res_dict)
         return final_result
 
     @staticmethod
@@ -68,18 +69,22 @@ class PDFExtracter:
 
         raise PDFExtracterError(f"{type(pdf_content)} is not in [str, Path, bytes].")
 
-    def extract_texts(self, pdf_data: bytes) -> Tuple[Dict, List]:
-        texts, page_idxs = {}, []
+    def extract_texts(self, pdf_data: bytes, force_ocr: bool) -> Tuple[Dict, List]:
+        texts, need_ocr_idxs = {}, []
         with fitz.open(stream=pdf_data) as doc:
             for i, page in enumerate(doc):
+                if force_ocr:
+                    need_ocr_idxs.append(i)
+                    continue
+
                 text = page.get_text()
                 if text:
                     texts[str(i)] = text
                 else:
-                    page_idxs.append(i)
-        return texts, page_idxs
+                    need_ocr_idxs.append(i)
+        return texts, need_ocr_idxs
 
-    def read_pdf_with_image(self, pdf_data: bytes, page_idxs: List) -> Dict:
+    def read_pdf_with_image(self, pdf_data: bytes, need_ocr_idxs: List) -> Dict:
         def convert_img(page):
             pix = page.get_pixmap(dpi=self.dpi)
             img = np.frombuffer(pix.samples, dtype=np.uint8)
@@ -88,7 +93,7 @@ class PDFExtracter:
             return img
 
         with fitz.open(stream=pdf_data) as doc:
-            page_img_dict = {k: convert_img(doc[k]) for k in page_idxs}
+            page_img_dict = {k: convert_img(doc[k]) for k in need_ocr_idxs}
         return page_img_dict
 
     def get_ocr_res(self, page_img_dict: Dict) -> Dict:
@@ -99,6 +104,12 @@ class PDFExtracter:
                 _, rec_res, _ = list(zip(*preds))
                 ocr_res[str(k)] = "\n".join(rec_res)
         return ocr_res
+
+    def merge_direct_ocr(self, txts_dict, ocr_res_dict):
+        final_result = {**txts_dict, **ocr_res_dict}
+        final_result = dict(sorted(final_result.items(), key=lambda x: int(x[0])))
+        final_result = [[k, v, "1.0"] for k, v in final_result.items()]
+        return final_result
 
     @staticmethod
     def which_type(content: Union[bytes, str, Path]) -> str:
@@ -120,6 +131,13 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-path", "--file_path", type=str, help="File path, PDF or images"
+    )
+    parser.add_argument(
+        "-f",
+        "--force_ocr",
+        action="store_true",
+        default=False,
+        help="Whether to use ocr for all pages.",
     )
     args = parser.parse_args()
 
