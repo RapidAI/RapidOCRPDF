@@ -14,15 +14,22 @@
 </div>
 
 ### 简介
-本仓库依托于[RapidOCR](https://github.com/RapidAI/RapidOCR)仓库，快速提取PDF中文字，包括扫描版PDF、加密版PDF。
-
-如果是可以直接复制的PDF，可以直接使用[pdf2docx](https://github.com/dothinking/pdf2docx)，不再重复造轮子
+本仓库依托于[RapidOCR](https://github.com/RapidAI/RapidOCR)仓库，快速提取PDF中文字，包括扫描版PDF、加密版PDF、可直接复制文字版PDF。
 
 如果是扫描版PDF，暂时不支持版式还原，后续有空会考虑加上，日期不定。
 
+### 整体流程
+```mermaid
+flowchart LR
+
+A(PDF) --> B{是否可以直接提取内容} --是--> C(PyMuPDF)
+B --否--> D(RapidOCR)
+
+C & D --> E(结果)
+```
+
 ### TODO
 - [ ] 支持图像的提取
-- [ ] 整合PyMuPDF工具，支持可直接复制文本的PDF内容提取
 - [ ] 整合版面分析模型，段落化输出PDF内容
 - [ ] 完善仓库文档
 
@@ -34,7 +41,6 @@ pip install rapidocr_pdf[onnxruntime]
 # 基于rapidocr_openvino
 pip install rapidocr_pdf[openvino]
 ```
-
 
 ### 使用
 脚本使用
@@ -67,7 +73,6 @@ rapidocr_pdf -path tests/test_files/direct_and_image.pdf
 ### 更新日志
 2023-08-28 v0.0.6 update:
 - 解决PyMuPDF版本依赖问题，对应[issue #2](https://github.com/RapidAI/RapidOCRPDF/issues/2)
-
 
 2023-04-17 v0.0.2 update:
 - 完善使用文档
