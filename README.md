@@ -47,7 +47,8 @@ pip install rapidocr_pdf[openvino]
 ```python
 from rapidocr_pdf import PDFExtracter
 
-pdf_extracter = PDFExtracter()
+rec_model_path = 'xxxx.onnx
+pdf_extracter = PDFExtracter(rec_model_path=rec_model_path)
 
 pdf_path = 'tests/test_files/direct_and_image.pdf'
 texts = pdf_extracter(pdf_path, force_ocr=False)
@@ -80,6 +81,9 @@ $ rapidocr_pdf -path tests/test_files/direct_and_image.pdf
 ```
 
 ### 更新日志
+2023-12-04 v0.0.8 update:
+- 兼容RapidOCR参数传入，具体可传入参数参见：[OCR传入参数说明](https://rapidai.github.io/RapidOCRDocs/docs/install_usage/rapidocr/usage/)
+
 2023-11-18 v0.0.7 update:
 - 修复[issue #3](https://github.com/RapidAI/RapidOCRPDF/issues/3), 添加`force_ocr`参数控制是否强制所有页面全部OCR
 

@@ -22,9 +22,9 @@ except:
 
 
 class PDFExtracter:
-    def __init__(self, dpi=200):
+    def __init__(self, dpi=200, **ocr_kwargs):
         self.dpi = dpi
-        self.text_sys = RapidOCR()
+        self.text_sys = RapidOCR(**ocr_kwargs)
         self.empyt_list = []
 
     def __call__(
