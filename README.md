@@ -81,6 +81,9 @@ $ rapidocr_pdf -path tests/test_files/direct_and_image.pdf
 ```
 
 ### 更新日志
+2024-01-16 v0.0.9 update:
+- 当PDF可以直接提取时，添加排序功能
+
 2023-12-04 v0.0.8 update:
 - 兼容RapidOCR参数传入，具体可传入参数参见：[OCR传入参数说明](https://rapidai.github.io/RapidOCRDocs/docs/install_usage/rapidocr/usage/)
 
