@@ -77,7 +77,7 @@ class PDFExtracter:
                     need_ocr_idxs.append(i)
                     continue
 
-                text = page.get_text()
+                text = page.get_text("text", sort=True)
                 if text:
                     texts[str(i)] = text
                 else:
