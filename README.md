@@ -47,7 +47,7 @@ pip install rapidocr_pdf[openvino]
 ```python
 from rapidocr_pdf import PDFExtracter
 
-rec_model_path = 'xxxx.onnx
+rec_model_path = 'xxxx.onnx'
 pdf_extracter = PDFExtracter(rec_model_path=rec_model_path)
 
 pdf_path = 'tests/test_files/direct_and_image.pdf'
