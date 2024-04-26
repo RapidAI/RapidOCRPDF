@@ -11,20 +11,26 @@ import filetype
 import fitz
 import numpy as np
 
-try:
-    from rapidocr_onnxruntime import RapidOCR
-except:
-    warnings.warn(
-        "Can't find the rapidocr_onnxruntime module,"
-        "try to import the rapidocr_openvino"
-    )
-    from rapidocr_openvino import RapidOCR
+from .utils import import_package
 
 
 class PDFExtracter:
     def __init__(self, dpi=200, **ocr_kwargs):
         self.dpi = dpi
-        self.text_sys = RapidOCR(**ocr_kwargs)
+
+        ocr_engine = import_package("rapidocr_onnxruntime")
+        if ocr_engine is None:
+            ocr_engine = import_package("rapidocr_openvino")
+
+            if ocr_engine is None:
+                ocr_engine = import_package("rapidocr_paddle")
+
+            if ocr_engine is None:
+                raise ModuleNotFoundError(
+                    "Can't find the rapidocr_onnxruntime/rapidocr_openvino/rapidocr_paddle module."
+                )
+
+        self.text_sys = ocr_engine.RapidOCR(**ocr_kwargs)
         self.empyt_list = []
 
     def __call__(
