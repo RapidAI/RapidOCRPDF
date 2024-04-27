@@ -31,15 +31,17 @@ C & D --> E(结果)
 ### TODO
 - [ ] 支持图像的提取
 - [ ] 整合版面分析模型，段落化输出PDF内容
-- [ ] 完善仓库文档
 
 ### 安装
 ```bash
-# 基于rapidocr_onnxruntime
+# 基于CPU 依赖rapidocr_onnxruntime
 pip install rapidocr_pdf[onnxruntime]
 
-# 基于rapidocr_openvino
+# 基于CPU 依赖rapidocr_openvino 更快
 pip install rapidocr_pdf[openvino]
+
+# 基于GPU 依赖rapidocr_paddle
+pip install rapidocr_pdf[paddle]
 ```
 
 ### 使用
@@ -47,8 +49,7 @@ pip install rapidocr_pdf[openvino]
 ```python
 from rapidocr_pdf import PDFExtracter
 
-rec_model_path = 'xxxx.onnx'
-pdf_extracter = PDFExtracter(rec_model_path=rec_model_path)
+pdf_extracter = PDFExtracter()
 
 pdf_path = 'tests/test_files/direct_and_image.pdf'
 texts = pdf_extracter(pdf_path, force_ocr=False)

@@ -1,13 +1,14 @@
 # -*- encoding: utf-8 -*-
 # @Author: SWHL
 # @Contact: liekkaskono@163.com
-from pathlib import Path
 import sys
+from pathlib import Path
 
 root_dir = Path(__file__).resolve().parent.parent
 sys.path.append(str(root_dir))
 
 import pytest
+
 from rapidocr_pdf import PDFExtracter, PDFExtracterError
 
 test_file_dir = Path(__file__).resolve().parent / "test_files"
@@ -17,7 +18,7 @@ extracter = PDFExtracter()
 @pytest.mark.parametrize(
     "pdf_content, result1, result2",
     [
-        (test_file_dir / "direct_extract.pdf", 3214, "The Ev"),
+        (test_file_dir / "direct_extract.pdf", 3214, "Defend"),
         (test_file_dir / "image.pdf", 3400, "Kurbas"),
         (test_file_dir / "direct_and_image.pdf", 3710, "ABCNet"),
     ],

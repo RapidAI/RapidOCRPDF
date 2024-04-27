@@ -27,7 +27,7 @@ class PDFExtracter:
 
             if ocr_engine is None:
                 raise ModuleNotFoundError(
-                    "Can't find the rapidocr_onnxruntime/rapidocr_openvino/rapidocr_paddle module."
+                    "Can't find the rapidocr_onnxruntime/rapidocr_openvino/rapidocr_paddle package.\n Please pip install rapidocr_onnxruntime to run the code."
                 )
 
         self.text_sys = ocr_engine.RapidOCR(**ocr_kwargs)
