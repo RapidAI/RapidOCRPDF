@@ -85,8 +85,6 @@ $ rapidocr_pdf -path tests/test_files/direct_and_image.pdf
 2024-04-27 v0.1.0 update:
 - 优化代码，更加优雅
 - 增加支持`rapidocr_paddle`库的支持，从而可以使用GPU来加速
-
-2024-01-16 v0.0.9 update:
 - 当PDF可以直接提取时，添加排序功能
 
 2023-12-04 v0.0.8 update:
