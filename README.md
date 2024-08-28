@@ -14,11 +14,13 @@
 </div>
 
 ### 简介
+
 本仓库依托于[RapidOCR](https://github.com/RapidAI/RapidOCR)仓库，快速提取PDF中文字，包括扫描版PDF、加密版PDF、可直接复制文字版PDF。
 
-如果是扫描版PDF，暂时不支持版式还原，后续有空会考虑加上，日期不定。
+🔥🔥🔥 版式还原参见项目：[RapidLayoutRecover](https://github.com/RapidAI/RapidLayoutRecover)
 
 ### 整体流程
+
 ```mermaid
 flowchart LR
 
@@ -28,11 +30,9 @@ B --否--> D(RapidOCR)
 C & D --> E(结果)
 ```
 
-### TODO
-- [ ] 支持图像的提取
-- [ ] 整合版面分析模型，段落化输出PDF内容
 
 ### 安装
+
 ```bash
 # 基于CPU 依赖rapidocr_onnxruntime
 pip install rapidocr_pdf[onnxruntime]
@@ -45,7 +45,9 @@ pip install rapidocr_pdf[paddle]
 ```
 
 ### 使用
+
 脚本使用
+
 ```python
 from rapidocr_pdf import PDFExtracter
 
@@ -57,6 +59,7 @@ print(texts)
 ```
 
 命令行使用
+
 ```bash
 $ rapidocr_pdf -h
 usage: rapidocr_pdf [-h] [-path FILE_PATH] [-f]
@@ -71,9 +74,11 @@ $ rapidocr_pdf -path tests/test_files/direct_and_image.pdf
 ```
 
 ### 输入输出说明
+
 **输入**：`Union[str, Path, bytes]`
 
 **输出**：`List` \[**页码**, **文本内容**, **置信度**\]， 具体参见下例：
+
 ```python
 [
     ['0', '人之初，性本善。性相近，习相远。', '0.8969868'],
@@ -82,19 +87,25 @@ $ rapidocr_pdf -path tests/test_files/direct_and_image.pdf
 ```
 
 ### 更新日志
+
 2024-04-27 v0.1.0 update:
+
 - 优化代码，更加优雅
 - 增加支持`rapidocr_paddle`库的支持，从而可以使用GPU来加速
 - 当PDF可以直接提取时，添加排序功能
 
 2023-12-04 v0.0.8 update:
+
 - 兼容RapidOCR参数传入，具体可传入参数参见：[OCR传入参数说明](https://rapidai.github.io/RapidOCRDocs/docs/install_usage/rapidocr/usage/)
 
 2023-11-18 v0.0.7 update:
+
 - 修复[issue #3](https://github.com/RapidAI/RapidOCRPDF/issues/3), 添加`force_ocr`参数控制是否强制所有页面全部OCR
 
 2023-08-28 v0.0.6 update:
+
 - 解决PyMuPDF版本依赖问题，对应[issue #2](https://github.com/RapidAI/RapidOCRPDF/issues/2)
 
 2023-04-17 v0.0.2 update:
+
 - 完善使用文档
