@@ -41,6 +41,8 @@ pip install rapidocr_pdf[onnxruntime]
 pip install rapidocr_pdf[openvino]
 
 # 基于GPU 依赖rapidocr_paddle
+# 1.安装 PaddlePaddle 框架 GPU 版, 参见: https://www.paddlepaddle.org.cn/
+# 2.安装 rapidocr_pdf[paddle]
 pip install rapidocr_pdf[paddle]
 ```
 

@@ -1,3 +1,2 @@
 filetype>=1.2.0
 pymupdf
-rapidocr_onnxruntime

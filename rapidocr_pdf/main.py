@@ -25,13 +25,19 @@ class PDFExtracter:
             if ocr_engine is None:
                 ocr_engine = import_package("rapidocr_paddle")
 
-            if ocr_engine is None:
-                raise ModuleNotFoundError(
-                    "Can't find the rapidocr_onnxruntime/rapidocr_openvino/rapidocr_paddle package.\n Please pip install rapidocr_onnxruntime to run the code."
-                )
+                if ocr_engine is not None:
+                    ocr_kwargs.update({
+                        "det_use_cuda": True,
+                        "cls_use_cuda": True,
+                        "rec_use_cuda": True
+                    })
+                else:
+                    raise ModuleNotFoundError(
+                        "Can't find the rapidocr_onnxruntime/rapidocr_openvino/rapidocr_paddle package.\n Please pip install rapidocr_onnxruntime to run the code."
+                    )
 
         self.text_sys = ocr_engine.RapidOCR(**ocr_kwargs)
-        self.empyt_list = []
+        self.empty_list = []
 
     def __call__(
         self,
@@ -50,12 +56,11 @@ class PDFExtracter:
             pdf_data = self.load_pdf(content)
         except PDFExtracterError as e:
             warnings.warn(str(e))
-            return self.empyt_list
+            return self.empty_list
 
         txts_dict, need_ocr_idxs = self.extract_texts(pdf_data, force_ocr)
 
-        page_img_dict = self.read_pdf_with_image(pdf_data, need_ocr_idxs)
-        ocr_res_dict = self.get_ocr_res(page_img_dict)
+        ocr_res_dict = self.get_ocr_res_streaming(pdf_data, need_ocr_idxs)
 
         final_result = self.merge_direct_ocr(txts_dict, ocr_res_dict)
         return final_result
@@ -90,7 +95,7 @@ class PDFExtracter:
                     need_ocr_idxs.append(i)
         return texts, need_ocr_idxs
 
-    def read_pdf_with_image(self, pdf_data: bytes, need_ocr_idxs: List) -> Dict:
+    def get_ocr_res_streaming(self, pdf_data: bytes, need_ocr_idxs: List) -> Dict:
         def convert_img(page):
             pix = page.get_pixmap(dpi=self.dpi)
             img = np.frombuffer(pix.samples, dtype=np.uint8)
@@ -98,24 +103,39 @@ class PDFExtracter:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             return img
 
-        with fitz.open(stream=pdf_data) as doc:
-            page_img_dict = {k: convert_img(doc[k]) for k in need_ocr_idxs}
-        return page_img_dict
-
-    def get_ocr_res(self, page_img_dict: Dict) -> Dict:
         ocr_res = {}
-        for k, v in page_img_dict.items():
-            preds, _ = self.text_sys(v)
-            if preds:
-                _, rec_res, _ = list(zip(*preds))
-                ocr_res[str(k)] = "\n".join(rec_res)
+        with fitz.open(stream=pdf_data) as doc:
+            for i in need_ocr_idxs:
+                img = convert_img(doc[i])
+                preds, _ = self.text_sys(img)
+                if preds:
+                    text = []
+                    confidences = []
+                    for pred in preds:
+                        _, rec_res, confidence = pred
+                        text.append(rec_res)
+                        confidences.append(float(confidence))
+
+                    avg_confidence = np.mean(confidences) if confidences else 0.0
+                    ocr_res[str(i)] = {
+                        "text": "\n".join(text),
+                        "avg_confidence": avg_confidence
+                    }
         return ocr_res
 
-    def merge_direct_ocr(self, txts_dict, ocr_res_dict):
-        final_result = {**txts_dict, **ocr_res_dict}
+    def merge_direct_ocr(self, txts_dict: Dict, ocr_res_dict: Dict) -> List[List[str]]:
+        final_result = {}
+        for page_idx, text in txts_dict.items():
+            final_result[page_idx] = {"text": text, "avg_confidence": "N/A"}
+
+        for page_idx, ocr_data in ocr_res_dict.items():
+            final_result[page_idx] = {
+                "text": ocr_data["text"],
+                "avg_confidence": ocr_data["avg_confidence"]
+            }
+
         final_result = dict(sorted(final_result.items(), key=lambda x: int(x[0])))
-        final_result = [[k, v, "1.0"] for k, v in final_result.items()]
-        return final_result
+        return [[k, v["text"], str(v["avg_confidence"])] for k, v in final_result.items()]
 
     @staticmethod
     def which_type(content: Union[bytes, str, Path]) -> str:
@@ -149,8 +169,11 @@ def main():
 
     pdf_extracter = PDFExtracter()
 
-    result = pdf_extracter(args.file_path)
-    print(result)
+    try:
+        result = pdf_extracter(args.file_path, args.force_ocr)
+        print(result)
+    except Exception as e:
+        print(f"[ERROR] {e}")
 
 
 if __name__ == "__main__":
