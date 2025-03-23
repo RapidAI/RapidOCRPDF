@@ -30,7 +30,6 @@ B --否--> D(RapidOCR)
 C & D --> E(结果)
 ```
 
-
 ### 安装
 
 ```bash
@@ -88,26 +87,4 @@ $ rapidocr_pdf -path tests/test_files/direct_and_image.pdf
 ]
 ```
 
-### 更新日志
-
-2024-04-27 v0.1.0 update:
-
-- 优化代码，更加优雅
-- 增加支持`rapidocr_paddle`库的支持，从而可以使用GPU来加速
-- 当PDF可以直接提取时，添加排序功能
-
-2023-12-04 v0.0.8 update:
-
-- 兼容RapidOCR参数传入，具体可传入参数参见：[OCR传入参数说明](https://rapidai.github.io/RapidOCRDocs/docs/install_usage/rapidocr/usage/)
-
-2023-11-18 v0.0.7 update:
-
-- 修复[issue #3](https://github.com/RapidAI/RapidOCRPDF/issues/3), 添加`force_ocr`参数控制是否强制所有页面全部OCR
-
-2023-08-28 v0.0.6 update:
-
-- 解决PyMuPDF版本依赖问题，对应[issue #2](https://github.com/RapidAI/RapidOCRPDF/issues/2)
-
-2023-04-17 v0.0.2 update:
-
-- 完善使用文档
+### [更新日志](https://github.com/RapidAI/RapidOCRPDF/releases)
