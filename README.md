@@ -76,8 +76,8 @@ $ rapidocr_pdf -path tests/test_files/direct_and_image.pdf
 
 ```python
 [
-    ['0', '人之初，性本善。性相近，习相远。', '0.8969868'],
-    ['1', 'Men at their birth, are naturally good.', '0.8969868'],
+    ['0', '人之初，性本善。性相近，习相远。', 0.8969868],
+    ['1', 'Men at their birth, are naturally good.', 0.8969868],
 ]
 ```
 
