@@ -3,7 +3,7 @@
     <h1><b><i>RapidOCR 📄 PDF</i></b></h1>
     </div>
 
-<a href=""><img src="https://img.shields.io/badge/Python->=3.6,<3.12-aff.svg"></a>
+<a href=""><img src="https://img.shields.io/badge/Python->=3.6-aff.svg"></a>
 <a href=""><img src="https://img.shields.io/badge/OS-Linux%2C%20Win%2C%20Mac-pink.svg"></a>
 <a href="https://pypi.org/project/rapidocr-pdf/"><img alt="PyPI" src="https://img.shields.io/pypi/v/rapidocr-pdf"></a>
 <a href="https://pepy.tech/project/rapidocr-pdf"><img src="https://static.pepy.tech/personalized-badge/rapidocr-pdf?period=total&units=abbreviation&left_color=grey&right_color=blue&left_text=Downloads"></a>
@@ -33,33 +33,27 @@ C & D --> E(结果)
 ### 安装
 
 ```bash
-# 基于CPU 依赖rapidocr_onnxruntime
-pip install rapidocr_pdf[onnxruntime]
-
-# 基于CPU 依赖rapidocr_openvino 更快
-pip install rapidocr_pdf[openvino]
-
-# 基于GPU 依赖rapidocr_paddle
-# 1.安装 PaddlePaddle 框架 GPU 版, 参见: https://www.paddlepaddle.org.cn/
-# 2.安装 rapidocr_pdf[paddle]
-pip install rapidocr_pdf[paddle]
+pip install rapidocr_pdf
 ```
 
 ### 使用
 
-脚本使用
+#### 脚本使用
+
+在`rapidocr_pdf>=0.2.0`中，已经适配`rapidocr>=2.0.0`版本，可以通过参数来使用不同OCR推理引擎来提速。
+下面的`ocr_params`为示例参数，详细请参见RapidOCR官方文档：[docs](https://rapidai.github.io/RapidOCRDocs/main/install_usage/rapidocr/usage/#_4) 。
 
 ```python
-from rapidocr_pdf import PDFExtracter
+from rapidocr_pdf import RapidOCRPDF
 
-pdf_extracter = PDFExtracter()
+pdf_extracter = RapidOCRPDF(ocr_params={"Global.with_torch": True})
 
-pdf_path = 'tests/test_files/direct_and_image.pdf'
+pdf_path = "tests/test_files/direct_and_image.pdf"
 texts = pdf_extracter(pdf_path, force_ocr=False)
 print(texts)
 ```
 
-命令行使用
+#### 命令行使用
 
 ```bash
 $ rapidocr_pdf -h

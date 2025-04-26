@@ -9,10 +9,10 @@ sys.path.append(str(root_dir))
 
 import pytest
 
-from rapidocr_pdf import PDFExtracter, PDFExtracterError
+from rapidocr_pdf import RapidOCRPDF, RapidOCRPDFError
 
 test_file_dir = Path(__file__).resolve().parent / "test_files"
-extracter = PDFExtracter()
+extracter = RapidOCRPDF()
 
 
 @pytest.mark.parametrize(
@@ -52,6 +52,6 @@ def test_force_ocr():
 
 @pytest.mark.parametrize("content", [None, ""])
 def test_corner_case(content):
-    with pytest.raises(PDFExtracterError) as exc_info:
+    with pytest.raises(RapidOCRPDFError) as exc_info:
         extracter(content)
-    assert exc_info.type is PDFExtracterError
+    assert exc_info.type is RapidOCRPDFError
