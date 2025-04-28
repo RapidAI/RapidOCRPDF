@@ -159,7 +159,8 @@ def parse_args(arg_list: Optional[List[str]] = None):
     )
     parser.add_argument(
         "--page_num_list",
-        type="str",
+        type=int,
+        nargs="*",
         default=None,
         help="Which pages will be extracted. e.g. 1,2,3. Note: the index of page num starts from 1.",
     )
@@ -170,13 +171,8 @@ def parse_args(arg_list: Optional[List[str]] = None):
 def main(arg_list: Optional[List[str]] = None):
     args = parse_args(arg_list)
     pdf_extracter = RapidOCRPDF(args.dpi)
-
-    page_num_list = [int(v) for v in args.page_num_list.split(",")]
-    import pdb
-
-    pdb.set_trace()
     try:
-        result = pdf_extracter(args.file_path, args.force_ocr, page_num_list)
+        result = pdf_extracter(args.pdf_path, args.force_ocr, args.page_num_list)
         print(result)
     except Exception as e:
         print(f"[ERROR] {e}")

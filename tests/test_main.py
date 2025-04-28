@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 # @Author: SWHL
 # @Contact: liekkaskono@163.com
+import ast
 import shlex
 import sys
 from pathlib import Path
@@ -25,14 +26,15 @@ extracter = RapidOCRPDF()
     "command, expected_output",
     [
         (
-            f"{pdf_path} --page_num_list '1'",
-            "Defending Ukraine: Early Lessons from the Cyber War",
+            f"{pdf_path} --page_num_list 1",
+            "ABCNet: Real-time Scene Text Spotting with Adaptive Bezier-Curve Network∗",
         )
     ],
 )
 def test_cli(capsys, command, expected_output):
     main(shlex.split(command))
     output = capsys.readouterr().out.rstrip()
+    output = ast.literal_eval(output)
     assert output[0][1].split("\n")[0].strip() == expected_output
 
 
