@@ -33,7 +33,7 @@ with gr.Blocks(
     """
     )
 
-    PDF(label="Document")
+    PDF(label="Upload a PDF", interactive=True)
     btn = gr.Button("Run")
 
 
