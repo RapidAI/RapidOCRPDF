@@ -11,7 +11,9 @@ import numpy as np
 from rapidocr import RapidOCR
 
 from .utils.logger import Logger
-from .utils.utils import which_type
+from .utils.utils import error_log, which_type
+
+logger = Logger(logger_name=__name__).get_log()
 
 
 class RapidOCRPDF:
@@ -19,7 +21,6 @@ class RapidOCRPDF:
         self.dpi = dpi
         self.ocr_engine = RapidOCR(params=ocr_params)
         self.empty_list = []
-        self.logger = Logger(logger_name=__name__).get_log()
 
     def __call__(
         self,
@@ -38,7 +39,7 @@ class RapidOCRPDF:
         try:
             pdf_data = self.load_pdf(content)
         except RapidOCRPDFError as e:
-            self.logger.error(e)
+            logger.error("%s\n%s", e, error_log())
             return self.empty_list
 
         txts_dict, need_ocr_idxs = self.extract_texts(
@@ -72,7 +73,7 @@ class RapidOCRPDF:
         with fitz.open(stream=pdf_data) as doc:
             page_num_list = self.get_page_num_range(page_num_list, doc.page_count)
             for i, page in enumerate(doc):
-                if page_num_list is not None and i + 1 not in page_num_list:
+                if page_num_list is not None and i not in page_num_list:
                     continue
 
                 if force_ocr:
@@ -81,7 +82,7 @@ class RapidOCRPDF:
 
                 text = page.get_text("text", sort=True)
                 if text:
-                    texts[str(i)] = text
+                    texts[i] = text
                 else:
                     need_ocr_idxs.append(i)
         return texts, need_ocr_idxs
@@ -93,8 +94,8 @@ class RapidOCRPDF:
         if page_num_list is None:
             return None
 
-        if max(page_num_list) > page_count:
-            raise ValueError(
+        if max(page_num_list) >= page_count:
+            raise RapidOCRPDFError(
                 f"The max value of {page_num_list} is greater than total page nums: {page_count}"
             )
 
@@ -121,7 +122,7 @@ class RapidOCRPDF:
                     sum(preds.scores) / len(preds.scores) if preds.scores else 0.0
                 )
 
-                ocr_res[str(i)] = {
+                ocr_res[i] = {
                     "text": "\n".join(preds.txts),
                     "avg_confidence": avg_score,
                 }
@@ -162,7 +163,7 @@ def parse_args(arg_list: Optional[List[str]] = None):
         type=int,
         nargs="*",
         default=None,
-        help="Which pages will be extracted. e.g. 1,2,3. Note: the index of page num starts from 1.",
+        help="Which pages will be extracted. e.g. 1 2 3. Note: the index of page num starts from 1.",
     )
     args = parser.parse_args(arg_list)
     return args
@@ -175,7 +176,7 @@ def main(arg_list: Optional[List[str]] = None):
         result = pdf_extracter(args.pdf_path, args.force_ocr, args.page_num_list)
         print(result)
     except Exception as e:
-        print(f"[ERROR] {e}")
+        logger.error("%s\n%s", e, error_log())
 
 
 if __name__ == "__main__":

@@ -17,8 +17,6 @@
 
 本仓库依托于[RapidOCR](https://github.com/RapidAI/RapidOCR)仓库，快速提取PDF中文字，包括扫描版PDF、加密版PDF、可直接复制文字版PDF。
 
-🔥🔥🔥 版式还原参见项目：[RapidLayoutRecover](https://github.com/RapidAI/RapidLayoutRecover)
-
 ### 整体流程
 
 ```mermaid
@@ -40,8 +38,10 @@ pip install rapidocr_pdf
 
 #### 脚本使用
 
-在`rapidocr_pdf>=0.2.0`中，已经适配`rapidocr>=2.0.0`版本，可以通过参数来使用不同OCR推理引擎来提速。
+⚠️注意：在`rapidocr_pdf>=0.2.0`中，已经适配`rapidocr>=2.0.0`版本，可以通过参数来使用不同OCR推理引擎来提速。
 下面的`ocr_params`为示例参数，详细请参见RapidOCR官方文档：[docs](https://rapidai.github.io/RapidOCRDocs/main/install_usage/rapidocr/usage/#_4) 。
+
+⚠️注意：在`rapidocr_pdf>=0.3.0`中，支持了`page_num_list`参数，默认为None，全部提取。**如果指定，页码从0开始**。
 
 ```python
 from rapidocr_pdf import RapidOCRPDF
@@ -49,7 +49,9 @@ from rapidocr_pdf import RapidOCRPDF
 pdf_extracter = RapidOCRPDF(ocr_params={"Global.with_torch": True})
 
 pdf_path = "tests/test_files/direct_and_image.pdf"
-texts = pdf_extracter(pdf_path, force_ocr=False)
+
+# page_num_list=[1]: 仅提取第2页
+texts = pdf_extracter(pdf_path, force_ocr=False, page_num_list=[1])
 print(texts)
 ```
 
@@ -57,15 +59,19 @@ print(texts)
 
 ```bash
 $ rapidocr_pdf -h
-usage: rapidocr_pdf [-h] [-path FILE_PATH] [-f]
+usage: rapidocr_pdf [-h] [--dpi DPI] [-f] [--page_num_list [PAGE_NUM_LIST ...]] pdf_path
 
-optional arguments:
+positional arguments:
+  pdf_path
+
+options:
   -h, --help            show this help message and exit
-  -path FILE_PATH, --file_path FILE_PATH
-                        File path, PDF or images
+  --dpi DPI
   -f, --force_ocr       Whether to use ocr for all pages.
+  --page_num_list [PAGE_NUM_LIST ...]
+                        Which pages will be extracted. e.g. 1 2 3. Note: the index of page num starts from 1.
 
-$ rapidocr_pdf -path tests/test_files/direct_and_image.pdf
+$ rapidocr_pdf tests/test_files/direct_and_image.pdf --page_num_lsit 1
 ```
 
 ### 输入输出说明
@@ -76,9 +82,7 @@ $ rapidocr_pdf -path tests/test_files/direct_and_image.pdf
 
 ```python
 [
-    ['0', '人之初，性本善。性相近，习相远。', 0.8969868],
-    ['1', 'Men at their birth, are naturally good.', 0.8969868],
+    [0, '人之初，性本善。性相近，习相远。', 0.8969868],
+    [1, 'Men at their birth, are naturally good.', 0.8969868],
 ]
 ```
-
-### [更新日志](https://github.com/RapidAI/RapidOCRPDF/releases)

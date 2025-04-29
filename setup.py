@@ -56,7 +56,7 @@ setuptools.setup(
     author_email="liekkaskono@163.com",
     url="https://github.com/RapidAI/RapidOCRPDF",
     license="Apache-2.0",
-    packages=[MODULE_NAME],
+    packages=setuptools.find_packages(),
     install_requires=read_txt("requirements.txt"),
     keywords=["rapidocr_pdf,rapidocr_onnxruntime,ocr,onnxruntime,openvino"],
     classifiers=[

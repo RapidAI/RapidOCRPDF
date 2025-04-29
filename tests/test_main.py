@@ -26,7 +26,7 @@ extracter = RapidOCRPDF()
     "command, expected_output",
     [
         (
-            f"{pdf_path} --page_num_list 1",
+            f"{pdf_path} --page_num_list 0",
             "ABCNet: Real-time Scene Text Spotting with Adaptive Bezier-Curve Network∗",
         )
     ],
@@ -40,7 +40,7 @@ def test_cli(capsys, command, expected_output):
 
 def test_page_num():
     pdf_path = test_dir / "direct_extract.pdf"
-    result = extracter(pdf_path, page_num_list=[1])
+    result = extracter(pdf_path, page_num_list=[0])
 
     assert (
         result[0][1].split("\n")[0].strip()
@@ -50,9 +50,9 @@ def test_page_num():
 
 def test_error_page_num():
     pdf_path = test_dir / "direct_extract.pdf"
-    with pytest.raises(ValueError) as exc_info:
-        result = extracter(pdf_path, page_num_list=[2])
-    assert exc_info.type is ValueError
+    with pytest.raises(RapidOCRPDFError) as exc_info:
+        result = extracter(pdf_path, page_num_list=[1])
+    assert exc_info.type is RapidOCRPDFError
 
 
 @pytest.mark.parametrize(
