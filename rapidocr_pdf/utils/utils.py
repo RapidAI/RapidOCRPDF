@@ -2,10 +2,15 @@
 # @Author: SWHL
 # @Contact: liekkaskono@163.com
 import importlib
+import traceback
 from pathlib import Path
 from typing import Union
 
 import filetype
+
+
+def error_log():
+    return traceback.format_exc()
 
 
 def import_package(name, package=None):

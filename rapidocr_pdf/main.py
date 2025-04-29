@@ -10,8 +10,10 @@ import fitz
 import numpy as np
 from rapidocr import RapidOCR
 
-from .logger import Logger
-from .utils import which_type
+from .utils.logger import Logger
+from .utils.utils import error_log, which_type
+
+logger = Logger(logger_name=__name__).get_log()
 
 
 class RapidOCRPDF:
@@ -19,10 +21,12 @@ class RapidOCRPDF:
         self.dpi = dpi
         self.ocr_engine = RapidOCR(params=ocr_params)
         self.empty_list = []
-        self.logger = Logger(logger_name=__name__).get_log()
 
     def __call__(
-        self, content: Union[str, Path, bytes], force_ocr: bool = False
+        self,
+        content: Union[str, Path, bytes],
+        force_ocr: bool = False,
+        page_num_list: Optional[List[int]] = None,
     ) -> List[List[Union[str, str, str]]]:
         try:
             file_type = which_type(content)
@@ -35,10 +39,12 @@ class RapidOCRPDF:
         try:
             pdf_data = self.load_pdf(content)
         except RapidOCRPDFError as e:
-            self.logger.error(e)
+            logger.error("%s\n%s", e, error_log())
             return self.empty_list
 
-        txts_dict, need_ocr_idxs = self.extract_texts(pdf_data, force_ocr)
+        txts_dict, need_ocr_idxs = self.extract_texts(
+            pdf_data, force_ocr, page_num_list
+        )
 
         ocr_res_dict = self.get_ocr_res_streaming(pdf_data, need_ocr_idxs)
 
@@ -60,20 +66,40 @@ class RapidOCRPDF:
 
         raise RapidOCRPDFError(f"{type(pdf_content)} is not in [str, Path, bytes].")
 
-    def extract_texts(self, pdf_data: bytes, force_ocr: bool) -> Tuple[Dict, List]:
+    def extract_texts(
+        self, pdf_data: bytes, force_ocr: bool, page_num_list: Optional[List[int]]
+    ) -> Tuple[Dict, List]:
         texts, need_ocr_idxs = {}, []
         with fitz.open(stream=pdf_data) as doc:
+            page_num_list = self.get_page_num_range(page_num_list, doc.page_count)
             for i, page in enumerate(doc):
+                if page_num_list is not None and i not in page_num_list:
+                    continue
+
                 if force_ocr:
                     need_ocr_idxs.append(i)
                     continue
 
                 text = page.get_text("text", sort=True)
                 if text:
-                    texts[str(i)] = text
+                    texts[i] = text
                 else:
                     need_ocr_idxs.append(i)
         return texts, need_ocr_idxs
+
+    @staticmethod
+    def get_page_num_range(
+        page_num_list: Optional[List[int]], page_count: int
+    ) -> Optional[List[int]]:
+        if page_num_list is None:
+            return None
+
+        if max(page_num_list) >= page_count:
+            raise RapidOCRPDFError(
+                f"The max value of {page_num_list} is greater than total page nums: {page_count}"
+            )
+
+        return page_num_list
 
     def get_ocr_res_streaming(self, pdf_data: bytes, need_ocr_idxs: List) -> Dict:
         def convert_img(page):
@@ -96,7 +122,7 @@ class RapidOCRPDF:
                     sum(preds.scores) / len(preds.scores) if preds.scores else 0.0
                 )
 
-                ocr_res[str(i)] = {
+                ocr_res[i] = {
                     "text": "\n".join(preds.txts),
                     "avg_confidence": avg_score,
                 }
@@ -121,11 +147,10 @@ class RapidOCRPDFError(Exception):
     pass
 
 
-def main():
+def parse_args(arg_list: Optional[List[str]] = None):
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-path", "--file_path", type=str, help="File path, PDF or images"
-    )
+    parser.add_argument("pdf_path", type=str)
+    parser.add_argument("--dpi", type=int, default=200)
     parser.add_argument(
         "-f",
         "--force_ocr",
@@ -133,15 +158,25 @@ def main():
         default=False,
         help="Whether to use ocr for all pages.",
     )
-    args = parser.parse_args()
+    parser.add_argument(
+        "--page_num_list",
+        type=int,
+        nargs="*",
+        default=None,
+        help="Which pages will be extracted. e.g. 0 1 2. Note: the index of page num starts from 0.",
+    )
+    args = parser.parse_args(arg_list)
+    return args
 
-    pdf_extracter = RapidOCRPDF()
 
+def main(arg_list: Optional[List[str]] = None):
+    args = parse_args(arg_list)
+    pdf_extracter = RapidOCRPDF(args.dpi)
     try:
-        result = pdf_extracter(args.file_path, args.force_ocr)
+        result = pdf_extracter(args.pdf_path, args.force_ocr, args.page_num_list)
         print(result)
     except Exception as e:
-        print(f"[ERROR] {e}")
+        logger.error("%s\n%s", e, error_log())
 
 
 if __name__ == "__main__":
