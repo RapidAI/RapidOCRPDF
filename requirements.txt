@@ -2,3 +2,4 @@ filetype>=1.2.0
 pymupdf
 rapidocr>=2.0.7
 colorlog
+onnxruntime
