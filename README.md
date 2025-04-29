@@ -69,9 +69,9 @@ options:
   --dpi DPI
   -f, --force_ocr       Whether to use ocr for all pages.
   --page_num_list [PAGE_NUM_LIST ...]
-                        Which pages will be extracted. e.g. 1 2 3. Note: the index of page num starts from 1.
+                        Which pages will be extracted. e.g. 0 1 2.
 
-$ rapidocr_pdf tests/test_files/direct_and_image.pdf --page_num_list 1
+$ rapidocr_pdf tests/test_files/direct_and_image.pdf --page_num_list 0 1
 ```
 
 ### 输入输出说明
