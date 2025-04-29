@@ -24,6 +24,7 @@ jobs:
       - name: Unit testings with rapidocr
         run: |
           pip install -r requirements.txt
+          pip install pytest
           pytest tests/test*.py
 
   GenerateWHL_PushPyPi:
