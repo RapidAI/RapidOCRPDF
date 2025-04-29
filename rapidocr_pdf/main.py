@@ -163,7 +163,7 @@ def parse_args(arg_list: Optional[List[str]] = None):
         type=int,
         nargs="*",
         default=None,
-        help="Which pages will be extracted. e.g. 1 2 3. Note: the index of page num starts from 1.",
+        help="Which pages will be extracted. e.g. 0 1 2. Note: the index of page num starts from 0.",
     )
     args = parser.parse_args(arg_list)
     return args
