@@ -2,12 +2,6 @@ name: Push rapidocr_pdf to pypi
 
 on:
   push:
-    # branches: [ main ]
-    # paths:
-    #   - 'rapidocr_pdf/**'
-    #   - 'docs/doc.md'
-    #   - 'setup.py'
-    #   - '.github/workflows/gen_whl_to_pypi_rapidocr_pdf.yml'
     tags:
       - v*
 
@@ -27,16 +21,9 @@ jobs:
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
 
-      - name: Unit testings with rapidocr_onnxruntime
+      - name: Unit testings with rapidocr
         run: |
           pip install -r requirements.txt
-          pip install pytest pymupdf==1.22.5 rapidocr_onnxruntime==1.3.17
-          pytest tests/test*.py
-
-      - name: Unit testings with rapidocr_openvino
-        run: |
-          pip uninstall rapidocr_onnxruntime -y
-          pip install rapidocr_openvino pymupdf==1.22.5 rapidocr_openvino==1.3.17
           pytest tests/test*.py
 
   GenerateWHL_PushPyPi:
