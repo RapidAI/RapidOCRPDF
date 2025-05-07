@@ -99,7 +99,21 @@ class RapidOCRPDF:
                 f"The max value of {page_num_list} is greater than total page nums: {page_count}"
             )
 
-        return page_num_list
+        # support negative number
+        new_page_num = []
+        for page_num in page_num_list:
+            if page_num >= 0:
+                new_page_num.append(page_num)
+
+            if abs(page_num) > page_count:
+                raise RapidOCRPDFError(
+                    f"{page_num} is out of range [{-page_count}, {page_count - 1})"
+                )
+
+            positive_num = page_count + page_num
+            new_page_num.append(positive_num)
+
+        return new_page_num
 
     def get_ocr_res_streaming(self, pdf_data: bytes, need_ocr_idxs: List) -> Dict:
         def convert_img(page):
