@@ -40,10 +40,12 @@ pip install rapidocr_pdf
 
 #### 脚本使用
 
-⚠️注意：在`rapidocr_pdf>=0.2.0`中，已经适配`rapidocr>=2.0.0`版本，可以通过参数来使用不同OCR推理引擎来提速。
-下面的`ocr_params`为示例参数，详细请参见RapidOCR官方文档：[docs](https://rapidai.github.io/RapidOCRDocs/main/install_usage/rapidocr/usage/#_4) 。
+⚠️注意：在`rapidocr_pdf>=0.4.0`中，支持`page_num_list`参数为负数，假设总页数为2，范围为`[-2, 1]`。
 
 ⚠️注意：在`rapidocr_pdf>=0.3.0`中，支持了`page_num_list`参数，默认为None，全部提取。**如果指定，页码从0开始**。
+
+⚠️注意：在`rapidocr_pdf>=0.2.0`中，已经适配`rapidocr>=2.0.0`版本，可以通过参数来使用不同OCR推理引擎来提速。
+下面的`ocr_params`为示例参数，详细请参见RapidOCR官方文档：[docs](https://rapidai.github.io/RapidOCRDocs/main/install_usage/rapidocr/usage/#_4) 。
 
 ```python
 from rapidocr_pdf import RapidOCRPDF

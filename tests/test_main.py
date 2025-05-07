@@ -38,6 +38,20 @@ def test_cli(capsys, command, expected_output):
     assert output[0][1].split("\n")[0].strip() == expected_output
 
 
+def test_negative_page_num():
+    pdf_path = test_dir / "direct_and_image.pdf"
+    result = extracter(pdf_path, page_num_list=[-1])
+
+    assert result[0][1].split("\n")[0].strip() == "Microsoft"
+
+
+def test_error_negative_page_num():
+    pdf_path = test_dir / "direct_and_image.pdf"
+    with pytest.raises(RapidOCRPDFError) as exc_info:
+        result = extracter(pdf_path, page_num_list=[-3])
+    assert exc_info.type is RapidOCRPDFError
+
+
 def test_page_num():
     pdf_path = test_dir / "direct_extract.pdf"
     result = extracter(pdf_path, page_num_list=[0])
