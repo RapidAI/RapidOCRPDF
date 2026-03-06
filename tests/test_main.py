@@ -10,6 +10,7 @@ cur_dir = Path(__file__).resolve().parent
 root_dir = cur_dir.parent
 sys.path.append(str(root_dir))
 
+import fitz
 import pytest
 
 from rapidocr_pdf import RapidOCRPDF, RapidOCRPDFError
@@ -109,3 +110,64 @@ def test_corner_case(content):
     with pytest.raises(RapidOCRPDFError) as exc_info:
         extracter(content)
     assert exc_info.type is RapidOCRPDFError
+
+
+# ---------------------------------------------------------------------------
+# Tests for to_searchable_pdf
+# ---------------------------------------------------------------------------
+
+
+def test_to_searchable_pdf_returns_bytes():
+    """to_searchable_pdf should return a non-empty bytes object."""
+    pdf_content = test_dir / "image.pdf"
+    result = extracter.to_searchable_pdf(pdf_content)
+    assert isinstance(result, bytes)
+    assert len(result) > 0
+
+
+def test_to_searchable_pdf_text_layer():
+    """The output PDF should contain a searchable text layer on OCR pages."""
+    pdf_content = test_dir / "image.pdf"
+    result = extracter.to_searchable_pdf(pdf_content)
+    with fitz.open(stream=result) as doc:
+        text = doc[0].get_text("text")
+    assert len(text) > 0
+
+
+def test_to_searchable_pdf_saves_file(tmp_path):
+    """When output_path is given the file should be written to disk."""
+    pdf_content = test_dir / "image.pdf"
+    out = tmp_path / "searchable.pdf"
+    extracter.to_searchable_pdf(pdf_content, output_path=out)
+    assert out.exists()
+    assert out.stat().st_size > 0
+
+
+def test_to_searchable_pdf_from_bytes():
+    """to_searchable_pdf should accept raw PDF bytes as input."""
+    pdf_content = test_dir / "image.pdf"
+    with open(pdf_content, "rb") as f:
+        data = f.read()
+    result = extracter.to_searchable_pdf(data)
+    assert isinstance(result, bytes)
+    with fitz.open(stream=result) as doc:
+        text = doc[0].get_text("text")
+    assert len(text) > 0
+
+
+def test_to_searchable_pdf_invalid_input():
+    """to_searchable_pdf should raise RapidOCRPDFError for invalid input."""
+    with pytest.raises(RapidOCRPDFError):
+        extracter.to_searchable_pdf(None)
+
+
+def test_cli_output_pdf(tmp_path):
+    """--output_pdf flag should produce a valid searchable PDF file."""
+    out = tmp_path / "out.pdf"
+    cmd = f"{test_dir / 'image.pdf'} --output_pdf {out}"
+    main(shlex.split(cmd))
+    assert out.exists()
+    assert out.stat().st_size > 0
+    with fitz.open(str(out)) as doc:
+        text = doc[0].get_text("text")
+    assert len(text) > 0

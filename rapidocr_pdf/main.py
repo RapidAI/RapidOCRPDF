@@ -15,6 +15,14 @@ from .utils.utils import error_log, which_type
 
 logger = Logger(logger_name=__name__).get_log()
 
+# Map Unicode ranges to PyMuPDF built-in CJK font names
+_CJK_FONT_RANGES = [
+    (0x4E00, 0x9FFF, "china-s"),   # CJK Unified Ideographs
+    (0x3400, 0x4DBF, "china-s"),   # CJK Extension A
+    (0x3040, 0x30FF, "japan"),     # Hiragana / Katakana
+    (0xAC00, 0xD7AF, "korea"),     # Hangul Syllables
+]
+
 
 class RapidOCRPDF:
     def __init__(self, dpi=200, ocr_params: Optional[Dict] = None):
@@ -156,6 +164,117 @@ class RapidOCRPDF:
         final_result = dict(sorted(final_result.items(), key=lambda x: int(x[0])))
         return [[k, v["text"], v["avg_confidence"]] for k, v in final_result.items()]
 
+    def to_searchable_pdf(
+        self,
+        content: Union[str, Path, bytes],
+        output_path: Optional[Union[str, Path]] = None,
+        force_ocr: bool = False,
+        page_num_list: Optional[List[int]] = None,
+    ) -> bytes:
+        """Add an invisible OCR text layer to image-based PDF pages.
+
+        Converts image-only pages into searchable PDF pages by overlaying
+        OCR-recognised text at the correct positions using render_mode=3
+        (invisible text).  Pages that already contain selectable text are
+        left unchanged unless *force_ocr* is True.
+
+        Args:
+            content: Input PDF – file path (str/Path) or raw bytes.
+            output_path: Optional path where the resulting PDF is saved.
+            force_ocr: When True, OCR every page even if it already has text.
+            page_num_list: Zero-based page indices to process.  None means
+                all pages.
+
+        Returns:
+            Modified PDF as bytes.
+        """
+        try:
+            file_type = which_type(content)
+        except (FileExistsError, TypeError) as e:
+            raise RapidOCRPDFError("The input content is empty.") from e
+
+        if file_type != "pdf":
+            raise RapidOCRPDFError("The file type is not PDF format.")
+
+        pdf_data = self.load_pdf(content)
+        _, need_ocr_idxs = self.extract_texts(pdf_data, force_ocr, page_num_list)
+
+        # Scale factor: image pixels (at self.dpi) → PDF points (72 dpi base)
+        scale = 72.0 / self.dpi
+
+        with fitz.open(stream=pdf_data) as doc:
+            for i in need_ocr_idxs:
+                page = doc[i]
+                pix = page.get_pixmap(dpi=self.dpi)
+                img = np.frombuffer(pix.samples, dtype=np.uint8).reshape(
+                    [pix.h, pix.w, pix.n]
+                )
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+                preds = self.ocr_engine(img)
+                if preds.txts is None or preds.boxes is None:
+                    continue
+
+                for box, txt in zip(preds.boxes, preds.txts):
+                    if not txt:
+                        continue
+                    self._insert_ocr_text(page, box, txt, scale)
+
+            result_bytes = doc.tobytes()
+
+        if output_path is not None:
+            Path(output_path).write_bytes(result_bytes)
+
+        return result_bytes
+
+    @staticmethod
+    def _select_font(text: str) -> str:
+        """Return a PyMuPDF built-in font name that covers *text*."""
+        for char in text:
+            code = ord(char)
+            for start, end, font in _CJK_FONT_RANGES:
+                if start <= code <= end:
+                    return font
+        return "helv"
+
+    @staticmethod
+    def _insert_ocr_text(
+        page: fitz.Page,
+        box: np.ndarray,
+        txt: str,
+        scale: float,
+    ) -> None:
+        """Insert invisible text for one OCR bounding box onto *page*.
+
+        Args:
+            page: The PyMuPDF page to annotate.
+            box: Four corner points ``[[x1,y1],…,[x4,y4]]`` in image pixels.
+            txt: Recognised text string.
+            scale: Conversion factor from image pixels to PDF points.
+        """
+        box_arr = np.asarray(box, dtype=float)
+        xs = box_arr[:, 0] * scale
+        ys = box_arr[:, 1] * scale
+        x0, y0 = float(xs.min()), float(ys.min())
+        x1, y1 = float(xs.max()), float(ys.max())
+        height = y1 - y0
+        if height <= 0 or x1 <= x0:
+            return
+
+        fontname = RapidOCRPDF._select_font(txt)
+        # insert_text expects the *baseline* (bottom-left) of the first line
+        point = fitz.Point(x0, y1)
+        try:
+            page.insert_text(
+                point,
+                txt,
+                fontname=fontname,
+                fontsize=height,
+                render_mode=3,  # invisible – text is searchable but not drawn
+            )
+        except Exception as e:
+            logger.debug("Skipping OCR token %r: %s", txt, e)
+
 
 class RapidOCRPDFError(Exception):
     pass
@@ -179,6 +298,15 @@ def parse_args(arg_list: Optional[List[str]] = None):
         default=None,
         help="Which pages will be extracted. e.g. 0 1 2. Note: the index of page num starts from 0.",
     )
+    parser.add_argument(
+        "--output_pdf",
+        type=str,
+        default=None,
+        help=(
+            "Path to save a searchable PDF with an invisible OCR text layer. "
+            "When specified, the tool writes a PDF instead of printing extracted text."
+        ),
+    )
     args = parser.parse_args(arg_list)
     return args
 
@@ -187,8 +315,16 @@ def main(arg_list: Optional[List[str]] = None):
     args = parse_args(arg_list)
     pdf_extracter = RapidOCRPDF(args.dpi)
     try:
-        result = pdf_extracter(args.pdf_path, args.force_ocr, args.page_num_list)
-        print(result)
+        if args.output_pdf:
+            pdf_extracter.to_searchable_pdf(
+                args.pdf_path,
+                output_path=args.output_pdf,
+                force_ocr=args.force_ocr,
+                page_num_list=args.page_num_list,
+            )
+        else:
+            result = pdf_extracter(args.pdf_path, args.force_ocr, args.page_num_list)
+            print(result)
     except Exception as e:
         logger.error("%s\n%s", e, error_log())
 
